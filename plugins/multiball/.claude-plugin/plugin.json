@@ -1,0 +1,20 @@
+{
+  "name": "multiball",
+  "displayName": "MULTIBALL",
+  "version": "0.1.0",
+  "description": "Several stories in play at once: parallel Claude Code sessions in isolated slots with full environments, a hub that verifies every hand-back, a self-checking knowledge base, and commit/comment/ticket voice calibrated to your team.",
+  "author": {
+    "name": "repeat2341"
+  },
+  "keywords": [
+    "parallel agents",
+    "worktrees",
+    "orchestration",
+    "multi-agent",
+    "knowledge base",
+    "commit messages",
+    "jira",
+    "video"
+  ],
+  "license": "MIT"
+}

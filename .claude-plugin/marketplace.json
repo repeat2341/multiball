@@ -1,0 +1,24 @@
+{
+  "name": "multiball",
+  "owner": {
+    "name": "repeat2341"
+  },
+  "description": "MULTIBALL! MULTIBALL!! MUL-TI-BALL!!! Parallel Claude Code slots with full environments, and the skills that go with them.",
+  "plugins": [
+    {
+      "name": "multiball",
+      "source": "./plugins/multiball",
+      "description": "Boot and run MULTIBALL: isolated slots, a verifying hub, checked knowledge, team-calibrated voice, tickets from notes, video ingest.",
+      "version": "0.1.0",
+      "category": "productivity",
+      "tags": [
+        "parallel-agents",
+        "orchestration",
+        "worktrees",
+        "voice",
+        "tickets",
+        "video"
+      ]
+    }
+  ]
+}
