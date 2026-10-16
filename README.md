@@ -17,7 +17,7 @@ no code to trust or keep in sync.
 ## Install
 
 ```
-/plugin marketplace add pburkindine/multiball
+/plugin marketplace add repeat2341/multiball
 /plugin install multiball@multiball
 ```
 
