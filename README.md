@@ -1,18 +1,27 @@
-# MULTIBALL
+# MULTIBALL! MULTIBALL!! MUL-TI-BALL!!!
+
+MULTIBALL is a way of working for one developer who uses Claude Code to run several tickets at once on one machine.
+Each ticket gets its own Claude Code session (a spoke) in its own slot: git worktrees, containers, a database copy and
+a browser sign-in, isolated from the other slots and from the developer's own checkout. One more session (the hub)
+plans the work, opens and closes slots, checks each finished ticket against its acceptance criteria, and fixes the
+tooling when a spoke reports a problem with it.
+
+It's for a project with a running environment (services, a database, a UI) and a ticket tracker. Small repos without
+those can use the parts that apply: the rules, the hand-back format, the commit and ticket voice. The rest can be left out.
+
+The repo provides:
+- `MULTIBALL.ai.md`: the method, written for Claude to read. It covers roles, git permissions, the ticket loop, evidence,
+  the hand-back, slots, the knowledge base, memory and the choir of other models, and ends with a step-by-step boot
+  sequence.
+- A Claude Code plugin with four skills: `multiball` (boot and run the hub), `voice-calibrate` (match commits, PRs,
+  comments and tickets to the team's own writing), `ticket-from-note` (draft a ticket from a one-line note) and
+  `watch-video` (captions, transcripts and frames from a video).
+- Specs, not code, for the tools the setup needs: the slot CLI, a guard hook, and knowledge and citation checks.
+  Claude builds them for your stack during boot.
 
 [![MULTIBALL! MULTIBALL!! MUL-TI-BALL!!!](https://img.youtube.com/vi/oQF8rQaIjUE/hqdefault.jpg)](https://www.youtube.com/watch?v=oQF8rQaIjUE&t=11s)
 
-*Third ball locked. Several stories in play at once, each in its own slot.*\
 *Clip: [Futurama, "Fear of a Bot Planet" (S1E5, 1999): Best Of Blernsball](https://www.youtube.com/watch?v=oQF8rQaIjUE&t=11s), official upload by SYFY.*
-
-MULTIBALL runs several Claude Code sessions at once on one machine, one story each, without them stepping on each other.
-Each runs against a full, isolated copy of your system: its own worktrees, containers, database and browser sign-in.
-One hub session plans the work, launches the slots, checks every hand-back against the acceptance criteria, and fixes
-its own tooling from what each slot reports. You rule on direction and use the product.
-
-It comes as one file an agent boots from, `MULTIBALL.ai.md`, plus a Claude Code plugin with the skills that go with it.
-The plugin ships instructions, specs and templates only: Claude builds each tool for your stack from them, so there is
-no code to trust or keep in sync.
 
 ## Install
 
