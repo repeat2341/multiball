@@ -1,8 +1,9 @@
 # MULTIBALL
 
-[![MULTIBALL! MULTIBALL!! MUL-TI-BALL!!!](https://img.youtube.com/vi/z0Zst4pMzh0/hqdefault.jpg)](https://www.youtube.com/watch?v=z0Zst4pMzh0)
+[![MULTIBALL! MULTIBALL!! MUL-TI-BALL!!!](https://img.youtube.com/vi/oQF8rQaIjUE/hqdefault.jpg)](https://www.youtube.com/watch?v=oQF8rQaIjUE&t=11s)
 
 *Third ball locked. Several stories in play at once, each in its own slot.*
+*Clip: [Futurama, "Fear of a Bot Planet" (S1E5, 1999): Best Of Blernsball](https://www.youtube.com/watch?v=oQF8rQaIjUE&t=11s), official upload by SYFY.*
 
 MULTIBALL runs several Claude Code sessions at once on one machine, one story each, without them stepping on each other.
 Each runs against a full, isolated copy of your system: its own worktrees, containers, database and browser sign-in.
@@ -60,5 +61,6 @@ MIT. See [LICENSE](LICENSE).
 
 ## Credits
 
-The name and the chant come from the blernsball game in *Futurama*, "Fear of a Bot Planet" (1999). The thumbnail
-links to YouTube; no footage is included in this repo.
+The name and the chant come from the blernsball game in *Futurama*, "Fear of a Bot Planet" (Season 1, Episode 5,
+1999), created by Matt Groening. The thumbnail links to SYFY's official clip on YouTube; no footage is included in this
+repo. Futurama is a trademark of 20th Television.
