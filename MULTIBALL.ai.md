@@ -5,7 +5,8 @@
 
 Read this file whole before doing anything else, then run § 16, Boot. It describes a way of working that took a year of
 stories to settle. One human (the Player) and one lead Claude session (the hub) run many stories at once:
-- each story runs in an isolated slot with a full running environment;
+- each story runs on the lightest runner that can produce its evidence: a subagent, a headless lane, or an isolated
+  slot with a full running environment (§ 8.10);
 - a choir of other models joins only where one session would be a mistake;
 - a knowledge system turns code, specs, meetings and stories into organised understanding that both the Player and
   Claude can read;
@@ -508,6 +509,32 @@ recipe; the hand-back rules (§ 6); and the shared-files rule. Template in § 15
 - The editor's file watcher must exclude dependency and build directories under `slots/`. Watching about 4M files
   dropped events and hung the editor.
 
+
+### 8.10 Runner tiers: the lightest runner that can produce the evidence
+
+A full slot (a terminal tab, a dev server, an interactive session, a pane the hub watches) costs memory, attention and
+setup time. Most work doesn't need one. The Player, 2026-10-17: "i see significant underutilization in that every slot
+gets and env and every q gets a slot". Pick the lightest tier that can produce the story's evidence, and move up only
+when the evidence demands it:
+
+| Tier | Runner | Has | Use it for |
+|---|---|---|---|
+| 0 | **Hub subagent** (the Agent tool, in the background) | the mirror, read-only by default; writes only into the meta-repo | questions, research, reviews, audits, tickets, docs, data entry, planning |
+| 1 | **Lane** (`mb new <story> --lane`) | a worktree, the guard, a dependency install from the shared store; one headless run (`claude -p`, the cheaper model); no tab, no dev server | code a test can verify: lints, tools, data, unit-tested features, refactors, fixes from a hand-back |
+| 2 | **Slot** (`mb new <story>`) | everything in a lane, plus a tab, a dev server, ports and an interactive session the hub can talk to | work that must be looked at or played while it's built: UI, feel, screenshots, play windows, long iterative stories |
+
+Rules:
+- **A question never gets a slot.** The hub answers it, or a tier-0 subagent does.
+- **A lane can't ask.** Its brief says so: it takes the recommended option, records it in the hand-back, and ends with
+  `done` or `blocked` (and a HUB-REQUEST). Its output lands in the story folder's `lane.log`; `mb watch` reports its
+  hand-back like any slot's. A lane is retired like a slot (`mb done`).
+- **Heavy verification leaves the laptop** (§ 8.9): lanes and slots run their full gates in the cloud, so a lane costs
+  little more than its worktree.
+- **A slot that stops needing its environment drops it.** Closing a session stops its dev server (`mb close`), so an
+  idle slot holds no processes.
+- **The cap is the token budget, not the machine.** Lanes are cheap in memory; count them against the model quota
+  like any session, read from a usage meter (for example a `tools/usage` that reads the plan's own usage endpoint).
+
 ---
 
 ## 9. The hub's operating procedures
@@ -562,7 +589,8 @@ without reading code. Treat role grants in maps as a lower bound: confirm in the
 asserting a role lacks something.
 
 ### 9.6 Quick stories, without a slot
-Small fixes that come out of QA and team questions are done by the hub itself:
+Prefer a lane (§ 8.10) for anything a test can verify. Small fixes that come out of QA and team questions can also be
+done by the hub itself:
 
 ```bash
 mb mirror <repo>
