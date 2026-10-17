@@ -461,7 +461,21 @@ recipe; the hand-back rules (§ 6); and the shared-files rule. Template in § 15
   could not answer slots as needed. Keep headless as an opt-in.
 - Open tabs through the terminal's CLI (`wezterm cli spawn`). Strip the hub's `CLAUDE*` and `ANTHROPIC*` environment
   variables before spawning, or the spoke inherits the hub's child-session marker and stops saving its transcript.
-- A session's history is keyed by its launch directory, so resuming in `slots/sN` always resumes that slot.
+- A session's history is keyed by its launch directory, so resuming in `slots/sN` always resumes that slot. The
+  converse bites: a resume launched in the wrong folder resumes the wrong conversation. Every scripted resume `cd`s into
+  its own folder inside the command, never trusting the spawner's cwd.
+- **Panes live in a mux server, not the terminal app.** In `~/.wezterm.lua`: `config.unix_domains = { { name = 'unix' } }`
+  and `config.default_gui_startup_args = { 'connect', 'unix' }`. The app only attaches, so quitting or restarting it
+  leaves every session, dev server, search and test run going, and reopening reattaches: a terminal restart is
+  idempotent. Before switching, stop any stale `wezterm-mux-server` (one left by an earlier `wezterm cli` holds no
+  slot panes, and attaching to it skips the startup hook); the switch itself costs one last lossy restart.
+- **A reboot resumes everything.** A `mux-startup` hook (it runs only when the mux server starts) opens the hub and one
+  tab per slot in the registry, each `cd`-ing into its folder and running `claude --continue '<resume where you stopped:
+  re-run any step cut off>'`, with the slot's companion shell below. A plain app restart never runs it.
+- **The hub hears about idle spokes.** The slot CLI's `watch` (run under the hub's monitor) reports a slot whose session
+  has no turn running, no background agents or shells, and an unfinished story, and treats a last message of an API
+  error as idle. The slot overlay tells spokes never to end a turn mid-story. Unwatched, spokes parked after an
+  increment and died silently in a network outage.
 - Each slot's memory key is symlinked to the one memory folder.
 
 ### 8.9 Resources
@@ -721,7 +735,7 @@ script and its state lives in plain files. Each replaced something that cost mea
 | Tool | Role | Replaced | Why, and the measured gain | Glue |
 |---|---|---|---|---|
 | **OrbStack** | Containers for slots | Docker Desktop | Idle 0.4 GB vs 1.8, cold start 2 s vs 12; a hostname per container; btrfs reflinks clone a 13 GB database in 0.72 s with no extra disk | Slot CLI |
-| **WezTerm** | Hub and slot terminals | Cursor's terminal panel | Tabs opened by script (`wezterm cli spawn`); Lua config; Cmd-click on `path:line` opens the editor even in Claude panes. Cursor took 30 s or more per link | `~/.wezterm.lua`: task groups as panes, a picker, environment scrub for spawned spokes |
+| **WezTerm** | Hub and slot terminals | Cursor's terminal panel | Tabs opened by script (`wezterm cli spawn`); Lua config; Cmd-click on `path:line` opens the editor even in Claude panes. Cursor took 30 s or more per link | `~/.wezterm.lua`: panes in a mux server (app restarts are lossless), a `mux-startup` resume, task groups as panes, a picker, environment scrub for spawned spokes |
 | **Zed** | Default editor for code and text | BBEdit, and Cursor as editor | Opens instantly at this scale; `zed path:line` | `duti` for file types; a workspace launcher with the meta-repo's folders |
 | **Cursor / VS Code** | Optional IDE for browsing only; never the place Claude sessions run | none | Its root watcher on about 4M files dropped 100–300 FSEvents an hour and stalled; links took 30 s or more. A session started in its terminal stops and asks for WezTerm unless the Player overrides it with the flat setup (top of this doc) | Workspace file with `files.watcherExclude` |
 | **TablePlus** | Databases | DBeaver | Opened from a URL by a script that never prints credentials; `sync` saves every connection (14) with keychain passwords in one command; read-write connections exist only in the Player's launcher | `tools/tableplus.py`; the vault helper caches each login until an hour before its lease ends. Before that cache, every agent read rotated the Player's login, which was lost within a day |
@@ -776,6 +790,9 @@ the frame rate. Keep downloads out of the repo.
 | Retirement on a slot whose spoke was mid-task | Refuse while the session is open; read its last messages |
 | Spokes lacked credentials and meta-repo tools | Read access and allow rules in slot settings; absolute paths in the overlay |
 | Spoke tabs opened by the hub saved no transcripts | Strip `CLAUDE*`/`ANTHROPIC*` from the spawn environment |
+| Restarting the terminal app killed every session, search and test run | Panes in a mux server; the app only attaches (§ 8.8) |
+| After a reboot, every slot tab resumed the hub's conversation (the tab's cwd didn't take) | Each resume command `cd`s into its folder itself |
+| Spokes parked after an increment, or died on an API outage, and the hub never noticed | `watch` reports idle spokes; spokes never end a turn mid-story |
 | The editor hung opening links | Watcher excludes for slot dependency and build dirs |
 | Domain facts proven in stories never reached the knowledge layer | Required `## Durable facts`, folded into `zk/` at retirement |
 | A choir was mandated by tier and no spoke ran it | Choir only where one session would be a mistake, set at launch, enforced at retirement |
@@ -921,7 +938,9 @@ default here.
 10. **Schedules.** Install the LaunchAgents (hourly meetings, weekly refresh) and test each by loading it once. Create
    the hub's session crons. Check: both logs show a clean run.
 11. **Workstation** (§ 13.2): install the stack and give each tool its launcher:
-    - terminal config;
+    - terminal config: panes in a mux server and the `mux-startup` resume (§ 8.8); Cmd-click that works inside
+      Claude panes (Claude captures the mouse, so `bypass_mouse_reporting_modifiers = 'SUPER'`, then a Cmd-down that
+      selects the word and a Cmd-up that opens it: a URL in the browser, `path:line` in the editor);
     - editor watcher excludes;
     - the database launcher;
     - Beyond Compare as difftool and mergetool;
