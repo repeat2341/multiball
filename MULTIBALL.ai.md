@@ -472,6 +472,10 @@ recipe; the hand-back rules (§ 6); and the shared-files rule. Template in § 15
 - **A reboot resumes everything.** A `mux-startup` hook (it runs only when the mux server starts) opens the hub and one
   tab per slot in the registry, each `cd`-ing into its folder and running `claude --continue '<resume where you stopped:
   re-run any step cut off>'`, with the slot's companion shell below. A plain app restart never runs it.
+- **Launch sessions in an interactive login shell** (`zsh -lic`), as a tab the Player opens would be. A mux server
+  starts from launchd with a bare environment, and `zsh -lc` skips `.zshrc`, so version managers (nvm, and the node and
+  pnpm they put on PATH) never load: every gate then dies with "command not found". The slot CLI also borrows an
+  interactive login shell's PATH when a tool it needs is missing.
 - **The hub hears about idle spokes.** The slot CLI's `watch` (run under the hub's monitor) reports a slot whose session
   has no turn running, no background agents or shells, and an unfinished story, and treats a last message of an API
   error as idle. The slot overlay tells spokes never to end a turn mid-story. Unwatched, spokes parked after an
@@ -793,6 +797,7 @@ the frame rate. Keep downloads out of the repo.
 | Restarting the terminal app killed every session, search and test run | Panes in a mux server; the app only attaches (§ 8.8) |
 | After a reboot, every slot tab resumed the hub's conversation (the tab's cwd didn't take) | Each resume command `cd`s into its folder itself |
 | Spokes parked after an increment, or died on an API outage, and the hub never noticed | `watch` reports idle spokes; spokes never end a turn mid-story |
+| After the switch to a mux server, every resumed session lacked node and pnpm | Launch with `zsh -lic`; the slot CLI repairs a bare PATH |
 | The editor hung opening links | Watcher excludes for slot dependency and build dirs |
 | Domain facts proven in stories never reached the knowledge layer | Required `## Durable facts`, folded into `zk/` at retirement |
 | A choir was mandated by tier and no spoke ran it | Choir only where one session would be a mistake, set at launch, enforced at retirement |
