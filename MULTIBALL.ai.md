@@ -118,6 +118,15 @@ in a decision log. The quote is the authority, and it stops drift.
 **Never needs asking:** anything with a conventional default, any read, and routine lookups. A production read-only
 count is a lookup, not a blocker.
 
+**The Player may run as the CEO** (a mode he grants in words; record the quote). Then nothing story-level goes to him:
+no A/B cards, feel checks or micro-rulings. The hub decides on the recommendation, logs it in the decision log as
+"Claude, on the recommendation", and keeps building. He plays, compares and rules in **taste rounds at milestone
+level**: two or three finished, tested directions, each built far enough that his pick steers weeks of work. He sees
+only **showcases** that pass a bar the project defines (its automatic quality bar, mass virtual testing, a side by side
+against the best in its field, finished craft). Genre or domain fidelity, research and measurement are the agents' job:
+he sets direction and taste, never the basics of his field. Even in CEO mode, irreversible, outward-facing and costly
+actions still reach him, as one line with a recommendation.
+
 **Git, as a ladder of grants.** Start at the bottom; each rung is granted by the Player in words and recorded with
 the quote:
 1. Default: Claude runs read-only git only. The Player branches and commits.
@@ -484,6 +493,13 @@ recipe; the hand-back rules (§ 6); and the shared-files rule. Template in § 15
 
 ### 8.9 Resources
 
+- **Overflow compute goes to the cloud as a scoped identity, never root.** A runner (e.g. `tools/cloud`) launches tagged
+  spot instances as a least-privilege user, clones read-only with a deploy key held in the cloud's secret store, runs one
+  job under `/usr/bin/time`, uploads log, outputs and metrics, and terminates itself, with a dead-man's switch. A budget
+  with alerts counts only the project's tag. Measure every job's wall time, peak memory and cost.
+- **Profile before you tune.** Size budget requests from measured peaks, and find every test near its timeout with the
+  test runner's JSON report, not one failure at a time.
+
 - Profiles (core, UI, pipelines, ETL) start only what a story needs. Refuse to start a profile above a memory
   threshold.
 - Run heavy jobs (full coverage runs, production builds, choir runs) through a budget governor. A job waits until the
@@ -511,6 +527,17 @@ recipe; the hand-back rules (§ 6); and the shared-files rule. Template in § 15
 - Tell running spokes about upstream changes that affect them, with the commit.
 - **Template changes reach running spokes only on request.** After `refresh`, tell each spoke to re-read `./CLAUDE.md`.
   Root `CLAUDE.md` changes reach every new session.
+- **Two-way comms.** `mb tell <sN|all> "…"` types a hub message into the spoke's session and logs it in the story's
+  `COMMS.md`; spokes answer under `## Reply <time>` and carry on, and read COMMS.md at every step boundary. `mb checkin`
+  asks every spoke for status, now, next, blockers and an ETA and prints one summary; give the Player a shorthand for
+  it (one project uses "a4bz"). Match replies by headings at line start, never by a header's prose.
+- **Shared numbering is claimed, never guessed.** Anything numbered across slots (decision IDs, migration numbers) is
+  claimed from a locked counter in the meta-repo (`mb did`); two slots once both took D-162, and a test now fails on a
+  duplicate.
+- **Never gate a conflicted tree.** A merge command that hits a conflict must stop the chain; check the merge's exit
+  before any gate runs, and run one gate set per tree at a time.
+- **Review windows for the Player** (when he plays or reviews a build): each check opens in its own window with its
+  objective on screen, and checks are pooled into rounds, never sent one at a time.
 
 ### 9.3 Verifying a hand-back, against the AC rather than the prompt
 - UI built wherever the AC names it;
@@ -798,6 +825,10 @@ the frame rate. Keep downloads out of the repo.
 | After a reboot, every slot tab resumed the hub's conversation (the tab's cwd didn't take) | Each resume command `cd`s into its folder itself |
 | Spokes parked after an increment, or died on an API outage, and the hub never noticed | `watch` reports idle spokes; spokes never end a turn mid-story |
 | After the switch to a mux server, every resumed session lacked node and pnpm | Launch with `zsh -lic`; the slot CLI repairs a bare PATH |
+| The Player was asked story-level questions all day ("you work for me") | CEO mode: taste rounds and showcases only (§ 2) |
+| Two slots used the same decision number | Claim shared numbers from a locked counter; a test fails on duplicates |
+| A gate run proceeded on a tree left mid-conflict | Check the merge's exit before gating; one gate set per tree |
+| Spokes couldn't be asked for status, and their status lines went stale | `mb tell` / `mb checkin` with replies in COMMS.md |
 | The editor hung opening links | Watcher excludes for slot dependency and build dirs |
 | Domain facts proven in stories never reached the knowledge layer | Required `## Durable facts`, folded into `zk/` at retirement |
 | A choir was mandated by tier and no spoke ran it | Choir only where one session would be a mistake, set at launch, enforced at retirement |
